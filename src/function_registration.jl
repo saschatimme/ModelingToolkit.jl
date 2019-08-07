@@ -9,13 +9,13 @@ macro register(sig)
     name = splitsig[:name]
     args = splitsig[:args]
     typargs = typed_args(args)
-    defs = :()
+    defs = Expr[]
     for typarg in typargs
         splitsig[:args] = typarg
         splitsig[:body] = :(Operation($name, Expression[$(args...)]))
-        defs = :($defs; $(combinedef(splitsig)))
+        push!(defs, combinedef(splitsig))
     end
-    esc(defs)
+    esc(Expr(:block, defs...))
 end
 # Create all valid combinations of Expression,Number for function signature
 function typed_args(args)
